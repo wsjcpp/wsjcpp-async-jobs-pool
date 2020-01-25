@@ -1,5 +1,5 @@
-#ifndef JOBS_POOL_H
-#define JOBS_POOL_H
+#ifndef WSJCPP_ASYNC_JOBS_POOL_H
+#define WSJCPP_ASYNC_JOBS_POOL_H
 
 #include <string>
 #include <mutex>
@@ -7,9 +7,9 @@
 #include <thread>
 #include <vector>
 
-class JobAsync {
+class WSJCppAsyncJob {
     public:
-        JobAsync(const std::string &sName);
+        WSJCppAsyncJob(const std::string &sName);
         const std::string &name();
         virtual bool run(const std::string &sWorkerId) = 0;
 
@@ -19,17 +19,17 @@ class JobAsync {
 
 // ---------------------------------------------------------------------
 
-class JobSchedule {
+class WSJCppAsyncJobSchedule {
     public:
         // TODO
 };
 
 // ---------------------------------------------------------------------
 
-class JobAsyncDeque {
+class WSJCppAsyncJobDeque {
     public:
-        JobAsync *pop();
-        void push(JobAsync *pJobAsync);
+        WSJCppAsyncJob *pop();
+        void push(WSJCppAsyncJob *pJobAsync);
         void cleanup();
         bool isEmpty();
 
@@ -37,15 +37,15 @@ class JobAsyncDeque {
         std::string TAG;
 
         std::mutex m_mtxJobsAsyncDeque;
-        std::deque<JobAsync *> m_dequeJobsAsync;
+        std::deque<WSJCppAsyncJob *> m_dequeJobsAsync;
 };
 
 // ---------------------------------------------------------------------
 
-class JobsThreadWorker {
+class WSJCppAsyncJobsThreadWorker {
     public:
 
-        JobsThreadWorker(const std::string &sName, JobAsyncDeque *pDeque);
+        WSJCppAsyncJobsThreadWorker(const std::string &sName, WSJCppAsyncJobDeque *pDeque);
 
         void start();
         void stop();
@@ -54,7 +54,7 @@ class JobsThreadWorker {
     private:
         std::string TAG;
         std::string m_sName;
-        JobAsyncDeque *m_pDeque;
+        WSJCppAsyncJobDeque *m_pDeque;
         bool m_bBuzy;
         bool m_bStop;
         pthread_t m_threadWorker;
@@ -62,26 +62,29 @@ class JobsThreadWorker {
 
 // ---------------------------------------------------------------------
 
-extern JobAsyncDeque *g_pJobsFastPool;
-extern std::vector<JobsThreadWorker *> *g_vJobsFastWorkers;
-extern int g_nMaxJobFastWorker;
+extern WSJCppAsyncJobDeque *g_pWSJCppAsyncJobsFastPool;
+extern std::vector<WSJCppAsyncJobsThreadWorker *> *g_vWSJCppAsyncJobsFastWorkers;
+extern int g_nMaxWSJCppAsyncJobFastWorker;
 
-extern JobAsyncDeque *g_pJobsLongPool; // TODO
-extern JobAsyncDeque *g_pJobsDelay; // TODO
-extern JobAsyncDeque *g_pJobsCron; // TODO
+extern WSJCppAsyncJobDeque *g_pWSJCppAsyncJobsLongPool; // TODO
+extern WSJCppAsyncJobDeque *g_pWSJCppAsyncJobsDelay; // TODO
+extern WSJCppAsyncJobDeque *g_pWSJCppAsyncJobsCron; // TODO
 // TODO control thread will be add delay and cron jobs to long
 
 // TODO statistics
 // TODO max thread different workers
 
-class JobsPool {
+class WSJCppAsyncJobsPool {
     public:
         static void initGlobalVariables();
 
-        static void addJobSlow(JobAsync *pJobAsync);
-        static void addJobFast(JobAsync *pJobAsync);
-        static void addJobDelay(int nMilliseconds, JobAsync *pJobAsync);
-        static void addJobCron(JobSchedule *pJobSchedule,JobAsync *pJobAsync);
+        static void addJobSlow(WSJCppAsyncJob *pJobAsync);
+        static void addJobFast(WSJCppAsyncJob *pJobAsync);
+        static void addJobDelay(int nMilliseconds, WSJCppAsyncJob *pJobAsync);
+        static void addJobShedule(
+            WSJCppAsyncJobSchedule *pJobSchedule, 
+            WSJCppAsyncJob *pJobAsync
+        );
 
         static void stop();
         static void start();
@@ -91,4 +94,4 @@ class JobsPool {
 
 // ---------------------------------------------------------------------
 
-#endif // JOBS_POOL_H
+#endif // WSJCPP_ASYNC_JOBS_POOL_H

@@ -1,5 +1,6 @@
 wsjcpp-async-jobs-pool
 tmp/*
+.wsjcpp/*
 
 # Prerequisites
 *.d
