@@ -10,18 +10,17 @@ int main(int argc, const char* argv[]) {
     std::string appName = std::string(WSJCPP_APP_NAME);
     std::string appVersion = std::string(WSJCPP_APP_VERSION);
 
-    // TODO move to WsjcppCore::init
     if (!WsjcppCore::dirExists(".wsjcpp")) {
         WsjcppCore::makeDir(".wsjcpp");
     }
     WsjcppLog::setPrefixLogFile("wsjcpp");
     WsjcppLog::setLogDirectory(".wsjcpp/logs");
 
-    std::vector<std::string> vArgs;
+    /*std::vector<std::string> vArgs;
 
     for (int i = 0; i < argc; i++) {
         vArgs.push_back(std::string(argv[i]));
-    }
+    }*/
 
     // TODO example
 

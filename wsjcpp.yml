@@ -17,7 +17,7 @@ required-libraries:
 
 dependencies:
   - name: "wsjcpp-core"
-    version: "v0.1.6"
+    version: "v0.1.7"
     url: "https://github.com/wsjcpp/wsjcpp-core:master"
     origin: "https://github.com/"
     installation-dir: "./src.wsjcpp/wsjcpp_core"
