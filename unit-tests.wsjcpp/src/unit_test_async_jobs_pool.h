@@ -1,13 +1,13 @@
-#ifndef UNIT_TEST_JOBS_POOL_H
-#define UNIT_TEST_JOBS_POOL_H
+#ifndef UNIT_TEST_ASYNC_JOBS_POOL_H
+#define UNIT_TEST_ASYNC_JOBS_POOL_H
 
-#include <unit_tests.h>
+#include <wsjcpp_unit_tests.h>
 
-class UnitTestJobsPool : public UnitTestBase {
+class UnitTestAsyncJobsPool : public WsjcppUnitTestBase {
     public:
-        UnitTestJobsPool();
+        UnitTestAsyncJobsPool();
         virtual void init();
         virtual bool run();
 };
 
-#endif // UNIT_TEST_JOBS_POOL_H
+#endif // UNIT_TEST_ASYNC_JOBS_POOL_H

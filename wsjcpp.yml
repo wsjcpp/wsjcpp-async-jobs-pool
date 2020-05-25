@@ -16,11 +16,11 @@ required-libraries:
   - pthread
 
 dependencies:
-  - name: "wsjcpp/wsjcpp-core"
-    version: "v0.0.3"
+  - name: "wsjcpp-core"
+    version: "v0.1.6"
     url: "https://github.com/wsjcpp/wsjcpp-core:master"
     origin: "https://github.com/"
-    installation-dir: "./src.wsjcpp/wsjcpp_wsjcpp_core"
+    installation-dir: "./src.wsjcpp/wsjcpp_core"
 
 repositories:
   - type: main
@@ -34,8 +34,11 @@ distribution:
   - source-file: "src/wsjcpp_async_jobs_pool.cpp"
     target-file: "wsjcpp_async_jobs_pool.cpp"
     type: "source-code"
-    sha1: "283d3deac2e04469e016c51e0dcebc713c490878"
   - source-file: "src/wsjcpp_async_jobs_pool.h"
     target-file: "wsjcpp_async_jobs_pool.h"
     type: "source-code"
-    sha1: "68ba0d93c8bb4ab6eec4120dbd68a9c2faf200b1"
+
+unit-tests:
+  cases:
+    - name: "AsyncJobsPool"
+      description: "Test"

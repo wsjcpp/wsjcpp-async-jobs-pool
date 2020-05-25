@@ -7,19 +7,15 @@
 
 int main(int argc, const char* argv[]) {
     std::string TAG = "MAIN";
-    std::string appName = std::string(WSJCPP_NAME);
-    std::string appVersion = std::string(WSJCPP_VERSION);
+    std::string appName = std::string(WSJCPP_APP_NAME);
+    std::string appVersion = std::string(WSJCPP_APP_VERSION);
 
-    // TODO move to WSJCppCore::init
-    if (!WSJCppCore::dirExists(".wsjcpp")) {
-        WSJCppCore::makeDir(".wsjcpp");
+    // TODO move to WsjcppCore::init
+    if (!WsjcppCore::dirExists(".wsjcpp")) {
+        WsjcppCore::makeDir(".wsjcpp");
     }
-    std::string appLogPath = ".wsjcpp/logs";
-    if (!WSJCppCore::dirExists(appLogPath)) {
-        WSJCppCore::makeDir(appLogPath);
-    }
-    WSJCppLog::setPrefixLogFile("wsjcpp");
-    WSJCppLog::setLogDirectory(".wsjcpp/logs");
+    WsjcppLog::setPrefixLogFile("wsjcpp");
+    WsjcppLog::setLogDirectory(".wsjcpp/logs");
 
     std::vector<std::string> vArgs;
 

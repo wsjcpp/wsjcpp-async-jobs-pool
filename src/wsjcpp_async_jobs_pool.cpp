@@ -3,21 +3,21 @@
 
 // ---------------------------------------------------------------------
 
-WSJCppAsyncJob::WSJCppAsyncJob(const std::string &sName) {
+WsjcppAsyncJob::WsjcppAsyncJob(const std::string &sName) {
     m_sName = sName;
 }
 
 // ---------------------------------------------------------------------
 
-const std::string &WSJCppAsyncJob::name() {
+const std::string &WsjcppAsyncJob::name() {
     return m_sName;
 }
 
 // ---------------------------------------------------------------------
 
-WSJCppAsyncJob *WSJCppAsyncJobDeque::pop() {
+WsjcppAsyncJob *WsjcppAsyncJobDeque::pop() {
     std::lock_guard<std::mutex> guard(this->m_mtxJobsAsyncDeque);
-    WSJCppAsyncJob *pJobAsync = nullptr;
+    WsjcppAsyncJob *pJobAsync = nullptr;
     int nSize = m_dequeJobsAsync.size();
     if (nSize > 0) {
         pJobAsync = m_dequeJobsAsync.back();
@@ -28,17 +28,17 @@ WSJCppAsyncJob *WSJCppAsyncJobDeque::pop() {
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobDeque::push(WSJCppAsyncJob *pJobAsync) {
+void WsjcppAsyncJobDeque::push(WsjcppAsyncJob *pJobAsync) {
     std::lock_guard<std::mutex> guard(this->m_mtxJobsAsyncDeque);
     if (m_dequeJobsAsync.size() > 20) {
-        WSJCppLog::warn(TAG, " deque more than " + std::to_string(m_dequeJobsAsync.size()));
+        WsjcppLog::warn(TAG, " deque more than " + std::to_string(m_dequeJobsAsync.size()));
     }
     m_dequeJobsAsync.push_front(pJobAsync);
 }
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobDeque::cleanup() {
+void WsjcppAsyncJobDeque::cleanup() {
     std::lock_guard<std::mutex> guard(this->m_mtxJobsAsyncDeque);
     while (m_dequeJobsAsync.size() > 0) {
         delete m_dequeJobsAsync.back();
@@ -48,7 +48,7 @@ void WSJCppAsyncJobDeque::cleanup() {
 
 // ----------------------------------------------------------------------
 
-bool WSJCppAsyncJobDeque::isEmpty() {
+bool WsjcppAsyncJobDeque::isEmpty() {
     std::lock_guard<std::mutex> guard(this->m_mtxJobsAsyncDeque);
     bool bRet = m_dequeJobsAsync.size() == 0;
     return bRet;
@@ -57,7 +57,7 @@ bool WSJCppAsyncJobDeque::isEmpty() {
 // ----------------------------------------------------------------------
 
 void* processJobsThreadWorker(void *arg) {
-    WSJCppAsyncJobsThreadWorker *pWorker = (WSJCppAsyncJobsThreadWorker *)arg;
+    WsjcppAsyncJobsThreadWorker *pWorker = (WsjcppAsyncJobsThreadWorker *)arg;
     pthread_detach(pthread_self());
     pWorker->run();
     return 0;
@@ -65,8 +65,8 @@ void* processJobsThreadWorker(void *arg) {
 
 // ----------------------------------------------------------------------
 
-WSJCppAsyncJobsThreadWorker::WSJCppAsyncJobsThreadWorker(const std::string &sName, WSJCppAsyncJobDeque *pDeque) {
-    TAG = "WSJCppAsyncJobsThreadWorker-" + sName;
+WsjcppAsyncJobsThreadWorker::WsjcppAsyncJobsThreadWorker(const std::string &sName, WsjcppAsyncJobDeque *pDeque) {
+    TAG = "WsjcppAsyncJobsThreadWorker-" + sName;
     m_pDeque = pDeque;
     m_bStop = false;
     m_bBuzy = false;
@@ -75,32 +75,32 @@ WSJCppAsyncJobsThreadWorker::WSJCppAsyncJobsThreadWorker(const std::string &sNam
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobsThreadWorker::start() {
+void WsjcppAsyncJobsThreadWorker::start() {
     m_bStop = false;
     pthread_create(&m_threadWorker, NULL, &processJobsThreadWorker, (void *)this);
 }
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobsThreadWorker::stop() {
+void WsjcppAsyncJobsThreadWorker::stop() {
     m_bStop = true;
 }
 
 // ----------------------------------------------------------------------
 
-bool WSJCppAsyncJobsThreadWorker::isBuzy() {
+bool WsjcppAsyncJobsThreadWorker::isBuzy() {
     return m_bBuzy;
 }
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobsThreadWorker::run() {
+void WsjcppAsyncJobsThreadWorker::run() {
     while (1) {
         if (m_bStop) {
             m_bBuzy = false;
             return;
         }
-        WSJCppAsyncJob *pJobAsync = m_pDeque->pop();
+        WsjcppAsyncJob *pJobAsync = m_pDeque->pop();
         while (pJobAsync != nullptr) {
             m_bBuzy = true;
             pJobAsync->run(TAG);
@@ -122,19 +122,19 @@ void WSJCppAsyncJobsThreadWorker::run() {
 
 // ----------------------------------------------------------------------
 
-WSJCppAsyncJobDeque *g_pWSJCppAsyncJobsFastPool = nullptr;
-std::vector<WSJCppAsyncJobsThreadWorker *> *g_vWSJCppAsyncJobsFastWorkers = nullptr;
-int g_nMaxWSJCppAsyncJobFastWorker = 2;
+WsjcppAsyncJobDeque *g_pWsjcppAsyncJobsFastPool = nullptr;
+std::vector<WsjcppAsyncJobsThreadWorker *> *g_vWsjcppAsyncJobsFastWorkers = nullptr;
+int g_nMaxWsjcppAsyncJobFastWorker = 2;
 
-void WSJCppAsyncJobsPool::initGlobalVariables() {
-    if (g_pWSJCppAsyncJobsFastPool == nullptr) {
-        g_pWSJCppAsyncJobsFastPool = new WSJCppAsyncJobDeque();
+void WsjcppAsyncJobsPool::initGlobalVariables() {
+    if (g_pWsjcppAsyncJobsFastPool == nullptr) {
+        g_pWsjcppAsyncJobsFastPool = new WsjcppAsyncJobDeque();
     }
-    if (g_vWSJCppAsyncJobsFastWorkers == nullptr) {
-        g_vWSJCppAsyncJobsFastWorkers = new std::vector<WSJCppAsyncJobsThreadWorker *>();
+    if (g_vWsjcppAsyncJobsFastWorkers == nullptr) {
+        g_vWsjcppAsyncJobsFastWorkers = new std::vector<WsjcppAsyncJobsThreadWorker *>();
         // 2 threads default
-        for (int i = 0; i < g_nMaxWSJCppAsyncJobFastWorker; i++) {
-            g_vWSJCppAsyncJobsFastWorkers->push_back(new WSJCppAsyncJobsThreadWorker("fast-worker" + std::to_string(i), g_pWSJCppAsyncJobsFastPool));
+        for (int i = 0; i < g_nMaxWsjcppAsyncJobFastWorker; i++) {
+            g_vWsjcppAsyncJobsFastWorkers->push_back(new WsjcppAsyncJobsThreadWorker("fast-worker" + std::to_string(i), g_pWsjcppAsyncJobsFastPool));
         }
     }
 }
@@ -142,54 +142,54 @@ void WSJCppAsyncJobsPool::initGlobalVariables() {
 // ----------------------------------------------------------------------
 
  // Two queue for fast jobs 
-void WSJCppAsyncJobsPool::addJobFast(WSJCppAsyncJob *pJobAsync) {
-    WSJCppAsyncJobsPool::initGlobalVariables();
-    g_pWSJCppAsyncJobsFastPool->push(pJobAsync);
+void WsjcppAsyncJobsPool::addJobFast(WsjcppAsyncJob *pJobAsync) {
+    WsjcppAsyncJobsPool::initGlobalVariables();
+    g_pWsjcppAsyncJobsFastPool->push(pJobAsync);
 }
 
 // ----------------------------------------------------------------------
 
 // Long time jobs like a send a lot of emails and etc...
 // better keep this list of jobs to storage
-void WSJCppAsyncJobsPool::addJobSlow(WSJCppAsyncJob *pJobAsync) {
-    WSJCppAsyncJobsPool::initGlobalVariables();
-    WSJCppLog::warn("WSJCppAsyncJobsPool", "addJobSlow not implemented yet");
+void WsjcppAsyncJobsPool::addJobSlow(WsjcppAsyncJob *pJobAsync) {
+    WsjcppAsyncJobsPool::initGlobalVariables();
+    WsjcppLog::warn("WsjcppAsyncJobsPool", "addJobSlow not implemented yet");
     // g_pJobsLong->push(pJobAsync);
 }
 
 // ----------------------------------------------------------------------
 
 // jobs with delay
-void WSJCppAsyncJobsPool::addJobDelay(int nMilliseconds, WSJCppAsyncJob *pJobAsync) {
-    WSJCppAsyncJobsPool::initGlobalVariables();
-    WSJCppLog::warn("WSJCppAsyncJobsPool", "addJobDelay not implemented yet");
+void WsjcppAsyncJobsPool::addJobDelay(int nMilliseconds, WsjcppAsyncJob *pJobAsync) {
+    WsjcppAsyncJobsPool::initGlobalVariables();
+    WsjcppLog::warn("WsjcppAsyncJobsPool", "addJobDelay not implemented yet");
     // g_pJobsShort->push(pJobAsync);
 }
 
 // ----------------------------------------------------------------------
 
 // jobs by cron, for example every 5 minutes execute some job
-void WSJCppAsyncJobsPool::addJobShedule(WSJCppAsyncJobSchedule *pJobSchedule, WSJCppAsyncJob *pJobAsync) {
-    WSJCppAsyncJobsPool::initGlobalVariables();
-    WSJCppLog::warn("WSJCppAsyncJobsPool", "addJobShedule not implemented yet");
+void WsjcppAsyncJobsPool::addJobShedule(WsjcppAsyncJobSchedule *pJobSchedule, WsjcppAsyncJob *pJobAsync) {
+    WsjcppAsyncJobsPool::initGlobalVariables();
+    WsjcppLog::warn("WsjcppAsyncJobsPool", "addJobShedule not implemented yet");
     // g_pJobsShort->push(pJobAsync);
 }
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobsPool::stop() {
-    WSJCppAsyncJobsPool::initGlobalVariables();
-    for (int i = 0; i < g_vWSJCppAsyncJobsFastWorkers->size(); i++) {
-        g_vWSJCppAsyncJobsFastWorkers->at(i)->stop();
+void WsjcppAsyncJobsPool::stop() {
+    WsjcppAsyncJobsPool::initGlobalVariables();
+    for (int i = 0; i < g_vWsjcppAsyncJobsFastWorkers->size(); i++) {
+        g_vWsjcppAsyncJobsFastWorkers->at(i)->stop();
     }
 }
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobsPool::start() {
-    WSJCppAsyncJobsPool::initGlobalVariables();
-    for (int i = 0; i < g_vWSJCppAsyncJobsFastWorkers->size(); i++) {
-        g_vWSJCppAsyncJobsFastWorkers->at(i)->start();
+void WsjcppAsyncJobsPool::start() {
+    WsjcppAsyncJobsPool::initGlobalVariables();
+    for (int i = 0; i < g_vWsjcppAsyncJobsFastWorkers->size(); i++) {
+        g_vWsjcppAsyncJobsFastWorkers->at(i)->start();
     }
     // TODO slow
     // TODO thread for cron and delay
@@ -197,18 +197,18 @@ void WSJCppAsyncJobsPool::start() {
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobsPool::waitForDone() {
+void WsjcppAsyncJobsPool::waitForDone() {
     // TODO when job in progress need wait deque for progress jobs ?
-    WSJCppAsyncJobsPool::initGlobalVariables();
+    WsjcppAsyncJobsPool::initGlobalVariables();
     bool bBuzy = true;
     while (bBuzy) {
         bBuzy = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        if (!g_pWSJCppAsyncJobsFastPool->isEmpty()) {
+        if (!g_pWsjcppAsyncJobsFastPool->isEmpty()) {
             bBuzy = true;
         }
-        for (int i = 0; i < g_vWSJCppAsyncJobsFastWorkers->size(); i++) {
-            if (g_vWSJCppAsyncJobsFastWorkers->at(i)->isBuzy()) {
+        for (int i = 0; i < g_vWsjcppAsyncJobsFastWorkers->size(); i++) {
+            if (g_vWsjcppAsyncJobsFastWorkers->at(i)->isBuzy()) {
                 bBuzy = true;
             }
         }
@@ -217,8 +217,8 @@ void WSJCppAsyncJobsPool::waitForDone() {
 
 // ----------------------------------------------------------------------
 
-void WSJCppAsyncJobsPool::cleanup() {
-    g_pWSJCppAsyncJobsFastPool->cleanup();
+void WsjcppAsyncJobsPool::cleanup() {
+    g_pWsjcppAsyncJobsFastPool->cleanup();
     // TODO slow
     // TODO thread for cron and delay
 }
