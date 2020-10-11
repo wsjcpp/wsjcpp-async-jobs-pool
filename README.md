@@ -4,6 +4,19 @@
 
 Multithreading jobs pool (asyncron tasks)
 
+## Integration via wsjcpp
 
+```
+wsjcpp install https://github.com/wsjcpp/wsjcpp-async-jobs-pool:master
+```
+
+## Integration via files
+
+Include this files:
+
+* `src.wsjcpp/wsjcpp_core/wsjcpp_core.h`
+* `src.wsjcpp/wsjcpp_core/wsjcpp_core.cpp`
+* `src/wsjcpp_async_jobs_pool.h`
+* `src/wsjcpp_async_jobs_pool.cpp`
 
 
