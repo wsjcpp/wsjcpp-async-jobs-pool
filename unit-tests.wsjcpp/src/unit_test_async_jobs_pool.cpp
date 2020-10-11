@@ -1,19 +1,19 @@
-#include "unit_test_async_jobs_pool.h"
-#include <vector>
-#include <wsjcpp_core.h>
+#include <wsjcpp_unit_tests.h>
 #include <wsjcpp_async_jobs_pool.h>
+
+class UnitTestAsyncJobsPool : public WsjcppUnitTestBase {
+    public:
+        UnitTestAsyncJobsPool();
+        virtual bool doBeforeTest();
+        virtual void executeTest();
+        virtual bool doAfterTest();
+};
 
 REGISTRY_WSJCPP_UNIT_TEST(UnitTestAsyncJobsPool)
 
 UnitTestAsyncJobsPool::UnitTestAsyncJobsPool()
     : WsjcppUnitTestBase("UnitTestAsyncJobsPool") {
     //
-}
-
-// ----------------------------------------------------------------------
-
-void UnitTestAsyncJobsPool::init() {
-    // nothing
 }
 
 // ----------------------------------------------------------------------
@@ -54,6 +54,7 @@ class JobAsyncWaiter : public WsjcppAsyncJob {
             std::this_thread::sleep_for(std::chrono::milliseconds(m_nMilliseconds));
             WsjcppLog::info(sWorkerId, "end job  " + std::to_string(m_nNumber));
             m_pJobWaiterResult->onDone();
+            return true;
         }
 
     private:
@@ -64,7 +65,14 @@ class JobAsyncWaiter : public WsjcppAsyncJob {
 
 // ----------------------------------------------------------------------
 
-bool UnitTestAsyncJobsPool::run() {
+bool UnitTestAsyncJobsPool::doBeforeTest() {
+    // do nothing
+    return true;
+}
+
+// ----------------------------------------------------------------------
+
+void UnitTestAsyncJobsPool::executeTest() {
     WsjcppAsyncJobsPool::start();
 
     // TEST waitForDone
@@ -76,11 +84,13 @@ bool UnitTestAsyncJobsPool::run() {
     }
 
     WsjcppAsyncJobsPool::waitForDone();
-    if (pJobWaiterResult->finishedJobs() != nCountJobs) {
-        WsjcppLog::err(TAG, "Test waitForDone FAILED expected " + std::to_string(nCountJobs) + ", but got " + std::to_string(pJobWaiterResult->finishedJobs()));
-        return false;
-    }
+    compare("Test waitForDone FAILED", pJobWaiterResult->finishedJobs(), nCountJobs);
+}
 
+// ----------------------------------------------------------------------
+
+bool UnitTestAsyncJobsPool::doAfterTest() {
+    // do nothing
     return true;
 }
 

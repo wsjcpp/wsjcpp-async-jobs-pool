@@ -2,7 +2,7 @@ wsjcpp_version: v0.0.1
 cmake_minimum_required: 3.0
 cmake_cxx_standard: 11
 name: wsjcpp-async-jobs-pool
-version: v0.0.1
+version: v0.0.2
 description: Multithreading jobs pool (asyncron tasks)
 issues: https://github.com/wsjcpp/wsjcpp-async-jobs-pool/issues
 keywords:
@@ -12,23 +12,20 @@ keywords:
   - "async"
   - "jobs"
 
-required-libraries:
-  - pthread
-
-dependencies:
-  - name: "wsjcpp-core"
-    version: "v0.1.7"
-    url: "https://github.com/wsjcpp/wsjcpp-core:master"
-    origin: "https://github.com/"
-    installation-dir: "./src.wsjcpp/wsjcpp_core"
-
 repositories:
   - type: main
     url: "https://github.com/wsjcpp/wsjcpp-async-jobs-pool"
-
 authors:
   - name: "Evgenii Sopov"
     email: "mrseakg@gmail.com"
+
+dependencies:
+  - name: "wsjcpp-core"
+    version: "v0.2.1"
+    url: "https://github.com/wsjcpp/wsjcpp-core:master"
+    origin: "https://github.com/"
+    installation-dir: "./src.wsjcpp/wsjcpp_core"
+    installation-datetime: "Sun, 11 Oct 2020 12:26:32 GMT"
 
 distribution:
   - source-file: "src/wsjcpp_async_jobs_pool.cpp"
